@@ -1211,10 +1211,10 @@
   resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.5.7.tgz#1d572bfbbe14b7704e0ba0f39b74815b84870d70"
   integrity sha512-dBVuXR082gk3jsFp7Rd/JI4kytwGHecnCoTtXFb7DB6CNHp4rg5k1bhg0nWdLGLnOV71lmDzGQaLMy8iPLY0pw==
 
-"@elastic/charts@^53.1.1":
-  version "53.1.1"
-  resolved "https://registry.yarnpkg.com/@elastic/charts/-/charts-53.1.1.tgz#bb5bd97d8f845dc2e30cc5238e04c1efbe56a157"
-  integrity sha512-DYZCcD26hSS3AIKJ13YAhzqY3q1uFECxgYnPCv++NIlsVGGPR5L09qUYpilhGrpbI95IwlkPT2LtZBEUGFYzTw==
+"@elastic/charts@^57.0.1":
+  version "57.0.1"
+  resolved "https://registry.yarnpkg.com/@elastic/charts/-/charts-57.0.1.tgz#c48209f11be8984310dd366f8ead6d8c04720402"
+  integrity sha512-+wVSMjZIk5oAfslRKpcmpVGgT4qbf3IGtp4rQEUVTIMAJiYv6m5optVmQvg+n/JkR9/k/SVobtW1WylIKzQi9w==
   dependencies:
     "@popperjs/core" "^2.4.0"
     bezier-easing "^2.1.0"
