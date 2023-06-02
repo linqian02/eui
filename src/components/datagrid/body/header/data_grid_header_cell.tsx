@@ -45,6 +45,7 @@ export const EuiDataGridHeaderCell: FunctionComponent<
   schema,
   schemaDetectors,
   defaultColumnWidth,
+  style,
   setColumnWidth,
   setVisibleColumns,
   switchColumnPos,
@@ -102,6 +103,7 @@ export const EuiDataGridHeaderCell: FunctionComponent<
       id={id}
       index={index}
       width={width}
+      style={style}
       headerIsInteractive={headerIsInteractive}
       aria-sort={ariaSort}
     >

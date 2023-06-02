@@ -358,6 +358,9 @@ export default function DataGrid() {
       <div>
         <EuiDataGrid
           aria-label="Top EUI contributors"
+          lockedColumns={{
+            ahead: 2,
+          }}
           leadingControlColumns={leadingControlColumns}
           trailingControlColumns={trailingControlColumns}
           columns={columns}

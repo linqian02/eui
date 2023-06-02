@@ -46,7 +46,8 @@
     "yo-changelog": "yo ./generator-eui/changelog/index.js",
     "release": "node ./scripts/release.js",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "postinstall": "patch-package"
   },
   "repository": {
     "type": "git",
@@ -208,6 +209,7 @@
     "jest-cli": "^24.1.0",
     "moment": "^2.27.0",
     "moment-timezone": "^0.5.31",
+    "patch-package": "^7.0.0",
     "path": "^0.12.7",
     "pegjs": "^0.10.0",
     "postcss": "^8.4.19",

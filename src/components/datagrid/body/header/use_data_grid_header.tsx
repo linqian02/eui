@@ -12,11 +12,15 @@ import { useMutationObserver } from '../../../observer/mutation_observer';
 import { useResizeObserver } from '../../../observer/resize_observer';
 
 import { useHeaderFocusWorkaround } from '../../utils/focus';
-import { EuiDataGridHeaderRowProps } from '../../data_grid_types';
+import {
+  EuiDataGridHeaderRowProps,
+  EuiDataGridLockedColumns,
+} from '../../data_grid_types';
 import { EuiDataGridHeaderRow } from './data_grid_header_row';
 
 type Props = EuiDataGridHeaderRowProps & {
   handleHeaderMutation: MutationCallback;
+  lockedColumns?: EuiDataGridLockedColumns;
 };
 
 /**

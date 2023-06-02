@@ -134,7 +134,9 @@ export interface EuiDataGridHeaderRowPropsSpecificProps {
 
 export type EuiDataGridHeaderRowProps = CommonProps &
   HTMLAttributes<HTMLDivElement> &
-  EuiDataGridHeaderRowPropsSpecificProps;
+  EuiDataGridHeaderRowPropsSpecificProps & {
+    lockedColumns?: EuiDataGridLockedColumns;
+  };
 
 export interface EuiDataGridHeaderCellProps
   extends Omit<
@@ -143,12 +145,14 @@ export interface EuiDataGridHeaderCellProps
   > {
   column: EuiDataGridColumn;
   index: number;
+  style?: CSSProperties;
 }
 
 export interface EuiDataGridControlHeaderCellProps {
   index: number;
   controlColumn: EuiDataGridControlColumn;
   headerIsInteractive: boolean;
+  style?: CSSProperties;
 }
 
 export interface EuiDataGridHeaderCellWrapperProps {
@@ -157,6 +161,7 @@ export interface EuiDataGridHeaderCellWrapperProps {
   headerIsInteractive: boolean;
   width?: number | null;
   className?: string;
+  style?: CSSProperties;
 }
 
 export type EuiDataGridFooterRowProps = CommonProps &
@@ -350,6 +355,11 @@ export type CommonGridProps = CommonProps &
      * Settings provided may be overwritten or merged with user defined preferences if `toolbarVisibility.showDisplaySelector.allowRowHeight = true` (which is the default).
      */
     rowHeightsOptions?: EuiDataGridRowHeightsOptions;
+    /**
+     * A #EuiDataGridLockedColumns object.
+     * 锁定列，目前仅支持锁定前几列
+     */
+    lockedColumns?: EuiDataGridLockedColumns;
   };
 
 // Force either aria-label or aria-labelledby to be defined
@@ -413,9 +423,14 @@ export interface EuiDataGridColumnSortingDraggableProps {
   display: string;
 }
 
+export interface EuiDataGridLockedColumns {
+  ahead?: number;
+  behind?: number;
+}
 export interface EuiDataGridBodyProps {
   leadingControlColumns: EuiDataGridControlColumn[];
   trailingControlColumns: EuiDataGridControlColumn[];
+  lockedColumns?: EuiDataGridLockedColumns;
   columns: EuiDataGridColumn[];
   visibleColCount: number;
   schema: EuiDataGridSchema;

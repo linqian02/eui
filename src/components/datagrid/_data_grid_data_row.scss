@@ -4,7 +4,7 @@
 
 @include euiDataGridRowCell {
   @include euiFontSizeS;
-
+  background-color: $euiColorEmptyShade;
   padding: $euiDataGridCellPaddingM;
   border-right: $euiDataGridVerticalBorder;
   border-bottom: $euiBorderThin;

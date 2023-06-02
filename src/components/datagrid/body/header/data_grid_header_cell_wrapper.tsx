@@ -33,6 +33,7 @@ export const EuiDataGridHeaderCellWrapper: FunctionComponent<
   width,
   className,
   children,
+  style,
   ...rest
 }) => {
   const classes = classnames('euiDataGridHeaderCell', className);
@@ -140,7 +141,7 @@ export const EuiDataGridHeaderCellWrapper: FunctionComponent<
       data-gridcell-column-index={index}
       data-gridcell-row-index="-1"
       data-gridcell-visible-row-index="-1"
-      style={width != null ? { width: `${width}px` } : {}}
+      style={width != null ? { width: `${width}px`, ...style } : {}}
       {...rest}
     >
       {children}

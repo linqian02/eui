@@ -130,7 +130,7 @@ const columns = [
   {
     id: 'email',
     displayAsText: 'Email address',
-    initialWidth: 130,
+    initialWidth: 230,
     cellActions: [
       ({ rowIndex, columnId, Component }) => {
         const data = useContext(DataContext);
@@ -149,10 +149,12 @@ const columns = [
   {
     id: 'location',
     displayAsText: 'Location',
+    initialWidth: 230,
   },
   {
     id: 'account',
     displayAsText: 'Account',
+    initialWidth: 230,
     actions: {
       showHide: { label: 'Custom hide label' },
       showMoveLeft: false,
@@ -192,22 +194,25 @@ const columns = [
   {
     id: 'date',
     displayAsText: 'Date',
+    initialWidth: 230,
     defaultSortDirection: 'desc',
   },
   {
     id: 'amount',
     displayAsText: 'Amount',
+    initialWidth: 230,
   },
   {
     id: 'phone',
     displayAsText: 'Phone',
+    initialWidth: 230,
     isSortable: false,
   },
   {
     id: 'version',
     displayAsText: 'Version',
     defaultSortDirection: 'desc',
-    initialWidth: 70,
+    initialWidth: 230,
     isResizable: false,
     actions: false,
   },
@@ -411,6 +416,9 @@ export default () => {
       <EuiDataGrid
         aria-label="Data grid demo"
         columns={columns}
+        lockedColumns={{
+          ahead: 3,
+        }}
         columnVisibility={{ visibleColumns, setVisibleColumns }}
         trailingControlColumns={trailingControlColumns}
         rowCount={raw_data.length}

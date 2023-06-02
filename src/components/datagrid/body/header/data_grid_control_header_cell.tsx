@@ -14,14 +14,13 @@ import { EuiDataGridHeaderCellWrapper } from './data_grid_header_cell_wrapper';
 
 export const EuiDataGridControlHeaderCell: FunctionComponent<
   EuiDataGridControlHeaderCellProps
-> = ({ controlColumn, index, headerIsInteractive }) => {
+> = ({ controlColumn, index, headerIsInteractive, style }) => {
   const {
     headerCellRender: HeaderCellRender,
     headerCellProps,
     width,
     id,
   } = controlColumn;
-
   return (
     <EuiDataGridHeaderCellWrapper
       {...headerCellProps}
@@ -32,6 +31,7 @@ export const EuiDataGridControlHeaderCell: FunctionComponent<
       id={id}
       index={index}
       width={width}
+      style={style}
       headerIsInteractive={headerIsInteractive}
     >
       <div className="euiDataGridHeaderCell__content">

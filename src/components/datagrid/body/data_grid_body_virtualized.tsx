@@ -46,13 +46,18 @@ export const _Cell: FunctionComponent<GridChildComponentProps> = ({
   data,
 }) => {
   const { headerRowHeight } = useContext(DataGridWrapperRowsContext);
+  const { lockedColumns } = data;
+  const lockedColHeadCount = lockedColumns?.ahead;
   return (
     <Cell
       colIndex={columnIndex}
       visibleRowIndex={rowIndex}
       style={{
         ...style,
+        display: 'inline-block',
         top: `${parseFloat(style.top as string) + headerRowHeight}px`,
+        position: columnIndex < lockedColHeadCount ? 'sticky' : 'absolute',
+        zIndex: columnIndex < lockedColHeadCount ? 1 : 0,
       }}
       {...data}
     />
@@ -100,6 +105,7 @@ export const EuiDataGridBodyVirtualized: FunctionComponent<
   leadingControlColumns,
   trailingControlColumns,
   columns,
+  lockedColumns,
   visibleColCount,
   schema,
   schemaDetectors,
@@ -182,6 +188,7 @@ export const EuiDataGridBodyVirtualized: FunctionComponent<
     setColumnWidth,
     schema,
     schemaDetectors,
+    lockedColumns,
   });
 
   const { footerRow, footerRowHeight } = useDataGridFooter({
@@ -300,6 +307,7 @@ export const EuiDataGridBodyVirtualized: FunctionComponent<
           'euiDataGrid__virtualized',
           virtualizationOptions?.className
         )}
+        disableColVirtualized={!!lockedColumns?.ahead}
         onItemsRendered={(itemsRendered) => {
           gridItemsRendered.current = itemsRendered;
           virtualizationOptions?.onItemsRendered?.(itemsRendered);
@@ -329,6 +337,7 @@ export const EuiDataGridBodyVirtualized: FunctionComponent<
           rowHeightUtils,
           rowManager,
           pagination,
+          lockedColumns,
         }}
         rowCount={
           IS_JEST_ENVIRONMENT || headerRowHeight > 0 ? visibleRowCount : 0
