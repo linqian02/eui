@@ -40,7 +40,7 @@ describe('useDataGridFullScreenSelector', () => {
         <div>
           <EuiToolTip
             content="Enter fullscreen"
-            delay="long"
+            delay="regular"
             display="inlineBlock"
             position="top"
           >
@@ -81,7 +81,7 @@ describe('useDataGridFullScreenSelector', () => {
                 )
               </React.Fragment>
             }
-            delay="long"
+            delay="regular"
             display="inlineBlock"
             position="top"
           >

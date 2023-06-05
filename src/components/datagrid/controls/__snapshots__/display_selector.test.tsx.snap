@@ -7,7 +7,7 @@ exports[`useDataGridDisplaySelector displaySelector renders a toolbar button/pop
     button={
       <EuiToolTip
         content="Display options"
-        delay="long"
+        delay="regular"
         display="inlineBlock"
         position="top"
       >

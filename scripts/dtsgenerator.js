@@ -112,49 +112,50 @@ generator.then(() => {
   fs.writeFileSync(
     defsFilePath,
     fs
-      .readFileSync(defsFilePath)
-      .toString()
-      .replace(/\/\/\/\W+<reference.*/g, '') // 1.
-      .replace(/import\("src\/(.*?)"\)/g, 'import("@elastic/eui/src/$1")') // 2.
-      .replace(
-        // start 3.
-        // find any singular `declare module { ... }` block
-        // {.*?^} matches anything until a } starts a new line (via `m` regex option, and `s` is dotall)
-        //
-        // aren't regex really bad for this? Yes.
-        // However, @babel/preset-typescript doesn't understand some syntax generated in eui.d.ts
-        // and the tooling around typescript's parsing & code generation is lacking and undocumented
-        // so... because this works with the guarantee that the newline-brace combination matches a module...
-        /declare module '(.*?)' {.*?^}/gms,
-        (module, moduleName) => {
-          // `moduleName` is the namespace for this ambient module
-          return module.replace(
-            // replace relative imports by attaching them to the module's namespace
-            /import\("([.]{1,2}\/.*?)"\)/g,
-            (importStatement, importPath) => {
-              let target = path.join(path.dirname(moduleName), importPath);
+    .readFileSync(defsFilePath)
+    .toString()
+    .replace(/\/\/\/\W+<reference.*/g, '') // 1.
+    .replace(/import\("src\/(.*?)"\)/g, 'import("@elastic/eui/src/$1")') // 2.
+    .replace(
+      // start 3.
+      // find any singular `declare module { ... }` block
+      // {.*?^} matches anything until a } starts a new line (via `m` regex option, and `s` is dotall)
+      //
+      // aren't regex really bad for this? Yes.
+      // However, @babel/preset-typescript doesn't understand some syntax generated in eui.d.ts
+      // and the tooling around typescript's parsing & code generation is lacking and undocumented
+      // so... because this works with the guarantee that the newline-brace combination matches a module...
+      /declare module '(.*?)' {.*?^}/gms,
+      (module, moduleName) => {
+        // `moduleName` is the namespace for this ambient module
+        module = module.replace(/\\/ig,'/'); // 修复反斜杠的问题
+        return module.replace(
+          // replace relative imports by attaching them to the module's namespace
+          /import\("([.]{1,2}\/.*?)"\)/g,
+          (importStatement, importPath) => {
+            let target = path.join(path.dirname(moduleName), importPath);
 
-              // if the target resolves to an orphaned index.ts file, remap to '@elastic/eui'
-              const filePath = target.replace('@elastic/eui', baseDir);
-              const filePathTs = `${filePath}.ts`;
-              const filePathTsx = `${filePath}.tsx`;
-              const filePathResolvedToIndex = path.join(filePath, 'index.ts');
-              if (
-                // fs.existsSync(filePath) === false && // target file doesn't exist
-                fs.existsSync(filePathTs) === false && // target file (.ts) doesn't exist
-                fs.existsSync(filePathTsx) === false && // target file (.tsx) doesn't exist
-                fs.existsSync(filePathResolvedToIndex) && // and it resolves to an index.ts
-                hasParentIndex(filePathResolvedToIndex) === false // does not get exported at a higher level
-              ) {
-                target = '@elastic/eui';
-              }
-
-              return `import ("${target}")`;
+            // if the target resolves to an orphaned index.ts file, remap to '@elastic/eui'
+            const filePath = target.replace('@elastic/eui', baseDir);
+            const filePathTs = `${filePath}.ts`;
+            const filePathTsx = `${filePath}.tsx`;
+            const filePathResolvedToIndex = path.join(filePath, 'index.ts');
+            if (
+              // fs.existsSync(filePath) === false && // target file doesn't exist
+              fs.existsSync(filePathTs) === false && // target file (.ts) doesn't exist
+              fs.existsSync(filePathTsx) === false && // target file (.tsx) doesn't exist
+              fs.existsSync(filePathResolvedToIndex) && // and it resolves to an index.ts
+              hasParentIndex(filePathResolvedToIndex) === false // does not get exported at a higher level
+            ) {
+              target = '@elastic/eui';
             }
-          );
-        }
-      ) // end 3.
-      .replace(/$/, `\n\n${buildEuiTokensObject()}`) // 4.
+            target = target.replace(/\\/ig, '/');
+            return `import ("${target}")`;
+          }
+        );
+      }
+    ) // end 3.
+    .replace(/$/, `\n\n${buildEuiTokensObject()}`) // 4.
   );
 });
 
@@ -163,20 +164,32 @@ generator.then(() => {
 function buildEuiTokensObject() {
   // reduce over the tokens list as a few of the tokens are used multiple times and must be
   // filtered down to a list
-  const { i18ndefs } = require('../i18ntokens.json').reduce(
-    ({ i18ndefs, tokens }, def) => {
+  const {
+    i18ndefs
+  } = require('../i18ntokens.json').reduce(
+    ({
+      i18ndefs,
+      tokens
+    }, def) => {
       if (!tokens.has(def.token)) {
         tokens.add(def.token);
         i18ndefs.push(def);
       }
-      return { i18ndefs, tokens };
-    },
-    { i18ndefs: [], tokens: new Set() }
+      return {
+        i18ndefs,
+        tokens
+      };
+    }, {
+      i18ndefs: [],
+      tokens: new Set()
+    }
   );
   return `
 declare module '@elastic/eui' {
   export type EuiTokensObject = {
-    ${i18ndefs.map(({ token }) => `"${token}": any;`).join('\n')}
+    ${i18ndefs.map(({ token }) => `
+  "${token}": any;
+  `).join('\n')}
   }
 }
   `;

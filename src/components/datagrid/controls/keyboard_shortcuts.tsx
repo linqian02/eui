@@ -32,7 +32,7 @@ export const useDataGridKeyboardShortcuts = (): {
         closePopover={() => setIsOpen(false)}
         anchorPosition="downRight"
         button={
-          <EuiToolTip content={title} delay="long">
+          <EuiToolTip content={title} delay="regular">
             <EuiButtonIcon
               size="xs"
               iconType="keyboard"

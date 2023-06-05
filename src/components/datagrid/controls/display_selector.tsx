@@ -224,7 +224,7 @@ export const useDataGridDisplaySelector = (
         panelPaddingSize="s"
         panelClassName="euiDataGrid__displayPopoverPanel"
         button={
-          <EuiToolTip content={buttonLabel} delay="long">
+          <EuiToolTip content={buttonLabel} delay="regular">
             <EuiButtonIcon
               size="xs"
               iconType={
