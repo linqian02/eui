@@ -26,7 +26,8 @@ export const EuiDataGridControlHeaderCell: FunctionComponent<
       {...headerCellProps}
       className={classNames(
         'euiDataGridHeaderCell--controlColumn',
-        headerCellProps?.className
+        headerCellProps?.className,
+        style?.position === 'sticky' ? 'euiDataGridHeaderCellSticky' : ''
       )}
       id={id}
       index={index}

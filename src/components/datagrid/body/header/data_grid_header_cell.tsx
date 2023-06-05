@@ -57,7 +57,8 @@ export const EuiDataGridHeaderCell: FunctionComponent<
   const columnType = schema[id] ? schema[id].columnType : null;
   const classes = classnames(
     { [`euiDataGridHeaderCell--${columnType}`]: columnType },
-    displayHeaderCellProps?.className
+    displayHeaderCellProps?.className,
+    style?.position === 'sticky' ? 'euiDataGridHeaderCellSticky' : ''
   );
 
   const { setFocusedCell, focusFirstVisibleInteractiveCell } =

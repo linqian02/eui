@@ -128,7 +128,7 @@ generator.then(() => {
       /declare module '(.*?)' {.*?^}/gms,
       (module, moduleName) => {
         // `moduleName` is the namespace for this ambient module
-        module = module.replace(/\\/ig,'/'); // 修复反斜杠的问题
+        // module = module.replace(/\\/ig,'/'); // 修复反斜杠的问题
         return module.replace(
           // replace relative imports by attaching them to the module's namespace
           /import\("([.]{1,2}\/.*?)"\)/g,
