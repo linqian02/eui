@@ -49,6 +49,9 @@
     "build-storybook": "storybook build",
     "postinstall": "patch-package"
   },
+  "publishConfig": {
+    "registry": "http://172.16.1.136:8081/nexus/repository/npm-hosted/"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/elastic/eui.git"
