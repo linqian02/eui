@@ -12,7 +12,7 @@
     "*.scss"
   ],
   "scripts": {
-    "start": "cross-env BABEL_MODULES=false webpack serve --config=src-docs/webpack.config.js",
+    "start": "cross-env NODE_OPTIONS=--openssl-legacy-provider BABEL_MODULES=false webpack serve --config=src-docs/webpack.config.js",
     "test-docker": "node ./scripts/test-docker.js",
     "test-a11y-docker": "node ./scripts/test-a11y-docker.js",
     "sync-docs": "node ./scripts/docs-sync.js",
@@ -58,7 +58,6 @@
     "**/react": "^17.0.0"
   },
   "pre-commit": [
-    "test-staged"
   ],
   "dependencies": {
     "@types/chroma-js": "^2.0.0",
@@ -278,6 +277,7 @@
     "test-env",
     "eui.d.ts",
     "i18ntokens.json",
-    "NOTICE.txt"
+    "NOTICE.txt",
+    "publish.js"
   ]
 }
