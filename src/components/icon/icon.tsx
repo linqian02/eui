@@ -29,6 +29,7 @@ import {
 export { COLORS } from './named_colors';
 import { isNamedColor, NamedColor } from './named_colors';
 import { euiIconStyles } from './icon.styles';
+import { typeToModuleMap } from './icon_imports';
 
 const getIsAppIcon = (iconType: IconType) => {
   if (typeof iconType !== 'string') return false;
@@ -199,13 +200,7 @@ export class EuiIconClass extends PureComponent<
       return;
     }
 
-    import(
-      /* webpackChunkName: "icon.[request]" */
-      // It's important that we don't use a template string here, it
-      // stops webpack from building a dynamic require context.
-      // eslint-disable-next-line prefer-template
-      './assets/' + typeToPathMap[iconType]
-    ).then(({ icon }) => {
+    typeToModuleMap[iconType]().then(({ icon }) => {
       iconComponentCache[iconType] = icon;
       enqueueStateChange(() => {
         if (this.isMounted && this.props.type === iconType) {
