@@ -14,6 +14,7 @@ import {
   emptyControlColumns,
   EuiDataGridHeaderRowProps,
 } from '../../data_grid_types';
+import { cloneDeep } from 'lodash';
 
 const EuiDataGridHeaderRow = forwardRef<
   HTMLDivElement,
@@ -69,6 +70,7 @@ const EuiDataGridHeaderRow = forwardRef<
             style={style}
             index={index}
             controlColumn={controlColumn}
+            isLastSticky={index === lockedColHeadCount - 1}
             headerIsInteractive={headerIsInteractive}
           />
         );
@@ -102,6 +104,7 @@ const EuiDataGridHeaderRow = forwardRef<
             index={index + leadingControlColumns.length}
             columnWidths={columnWidths}
             schema={schema}
+            isLastSticky={cIndex === lockedColHeadCount - 1}
             schemaDetectors={schemaDetectors}
             setColumnWidth={setColumnWidth}
             setVisibleColumns={setVisibleColumns}

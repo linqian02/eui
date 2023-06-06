@@ -46,6 +46,7 @@ export const EuiDataGridHeaderCell: FunctionComponent<
   schemaDetectors,
   defaultColumnWidth,
   style,
+  isLastSticky,
   setColumnWidth,
   setVisibleColumns,
   switchColumnPos,
@@ -58,7 +59,8 @@ export const EuiDataGridHeaderCell: FunctionComponent<
   const classes = classnames(
     { [`euiDataGridHeaderCell--${columnType}`]: columnType },
     displayHeaderCellProps?.className,
-    style?.position === 'sticky' ? 'euiDataGridHeaderCellSticky' : ''
+    style?.position === 'sticky' ? 'euiDataGridHeaderCellSticky' : '',
+    isLastSticky ? 'euiDataGridHeaderCellSticky_last' : ''
   );
 
   const { setFocusedCell, focusFirstVisibleInteractiveCell } =

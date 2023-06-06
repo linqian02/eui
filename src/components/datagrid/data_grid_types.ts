@@ -146,6 +146,7 @@ export interface EuiDataGridHeaderCellProps
   column: EuiDataGridColumn;
   index: number;
   style?: CSSProperties;
+  isLastSticky?: boolean;
 }
 
 export interface EuiDataGridControlHeaderCellProps {
@@ -153,6 +154,7 @@ export interface EuiDataGridControlHeaderCellProps {
   controlColumn: EuiDataGridControlColumn;
   headerIsInteractive: boolean;
   style?: CSSProperties;
+  isLastSticky?: boolean;
 }
 
 export interface EuiDataGridHeaderCellWrapperProps {
@@ -596,11 +598,11 @@ export interface EuiDataGridCellProps {
   className?: string;
   popoverContext: DataGridCellPopoverContextShape;
   renderCellValue:
-    | JSXElementConstructor<EuiDataGridCellValueElementProps>
-    | ((props: EuiDataGridCellValueElementProps) => ReactNode);
+  | JSXElementConstructor<EuiDataGridCellValueElementProps>
+  | ((props: EuiDataGridCellValueElementProps) => ReactNode);
   renderCellPopover?:
-    | JSXElementConstructor<EuiDataGridCellPopoverElementProps>
-    | ((props: EuiDataGridCellPopoverElementProps) => ReactNode);
+  | JSXElementConstructor<EuiDataGridCellPopoverElementProps>
+  | ((props: EuiDataGridCellPopoverElementProps) => ReactNode);
   setRowHeight?: (height: number) => void;
   getRowHeight?: (rowIndex: number) => number;
   style?: React.CSSProperties;
@@ -867,15 +869,15 @@ export interface EuiDataGridToolBarVisibilityOptions {
    * Allows the ability for the user to hide fields and sort columns, boolean or a #EuiDataGridToolBarVisibilityColumnSelectorOptions
    */
   showColumnSelector?:
-    | boolean
-    | EuiDataGridToolBarVisibilityColumnSelectorOptions;
+  | boolean
+  | EuiDataGridToolBarVisibilityColumnSelectorOptions;
   /**
    * Allows the ability for the user to customize display settings such as grid density and row heights.
    * User changes will override what is provided in #EuiDataGridStyle and #EuiDataGridRowHeightsOptions
    */
   showDisplaySelector?:
-    | boolean
-    | EuiDataGridToolBarVisibilityDisplaySelectorOptions;
+  | boolean
+  | EuiDataGridToolBarVisibilityDisplaySelectorOptions;
   /**
    * Allows the ability for the user to sort rows based upon column values
    */

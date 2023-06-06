@@ -60,7 +60,10 @@ export const _Cell: FunctionComponent<GridChildComponentProps> = ({
         zIndex: columnIndex < lockedColHeadCount ? 1 : 0,
       }}
       className={classNames(
-        columnIndex < lockedColHeadCount ? 'euiDataGridCellSticky' : ' '
+        columnIndex < lockedColHeadCount ? 'euiDataGridCellSticky' : ' ',
+        columnIndex === lockedColHeadCount - 1
+          ? 'euiDataGridCellSticky_last'
+          : ' '
       )}
       {...data}
     />

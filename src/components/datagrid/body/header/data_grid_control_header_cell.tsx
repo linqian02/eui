@@ -14,7 +14,7 @@ import { EuiDataGridHeaderCellWrapper } from './data_grid_header_cell_wrapper';
 
 export const EuiDataGridControlHeaderCell: FunctionComponent<
   EuiDataGridControlHeaderCellProps
-> = ({ controlColumn, index, headerIsInteractive, style }) => {
+> = ({ controlColumn, index, headerIsInteractive, style, isLastSticky }) => {
   const {
     headerCellRender: HeaderCellRender,
     headerCellProps,
@@ -27,7 +27,8 @@ export const EuiDataGridControlHeaderCell: FunctionComponent<
       className={classNames(
         'euiDataGridHeaderCell--controlColumn',
         headerCellProps?.className,
-        style?.position === 'sticky' ? 'euiDataGridHeaderCellSticky' : ''
+        style?.position === 'sticky' ? 'euiDataGridHeaderCellSticky' : '',
+        isLastSticky ? 'euiDataGridHeaderCellSticky_last' : ''
       )}
       id={id}
       index={index}
