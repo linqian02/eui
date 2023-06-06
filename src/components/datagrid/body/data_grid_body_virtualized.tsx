@@ -14,6 +14,7 @@ import React, {
   useContext,
   useEffect,
   useRef,
+  useState,
 } from 'react';
 import {
   GridChildComponentProps,
@@ -136,222 +137,240 @@ export const EuiDataGridBodyVirtualized: FunctionComponent<
   gridItemsRendered,
   wrapperRef,
 }) => {
-  /**
-   * Grid refs & observers
-   */
-  const wrapperDimensions = useResizeObserver(wrapperRef.current);
-  const outerGridRef = useRef<HTMLDivElement | null>(null); // container that becomes scrollable
-  const innerGridRef = useRef<HTMLDivElement | null>(null); // container sized to fit all content
+    /**
+     * Grid refs & observers
+     */
+    const wrapperDimensions = useResizeObserver(wrapperRef.current);
+    const outerGridRef = useRef<HTMLDivElement | null>(null); // container that becomes scrollable
+    const innerGridRef = useRef<HTMLDivElement | null>(null); // container sized to fit all content
+    const [virtualizedClassName, setVirtualizedClassName] = useState('');
+    /**
+     * Scroll bars
+     */
+    const {
+      scrollBarHeight,
+      hasVerticalScroll,
+      hasHorizontalScroll,
+      scrollBorderOverlay,
+    } = useScrollBars(outerGridRef, gridStyles.border);
 
-  /**
-   * Scroll bars
-   */
-  const {
-    scrollBarHeight,
-    hasVerticalScroll,
-    hasHorizontalScroll,
-    scrollBorderOverlay,
-  } = useScrollBars(outerGridRef, gridStyles.border);
+    /**
+     * Widths
+     */
+    const virtualizeContainerWidth = useVirtualizeContainerWidth(
+      outerGridRef.current,
+      gridWidth,
+      pagination?.pageSize
+    );
 
-  /**
-   * Widths
-   */
-  const virtualizeContainerWidth = useVirtualizeContainerWidth(
-    outerGridRef.current,
-    gridWidth,
-    pagination?.pageSize
-  );
+    // compute the default column width from the container's width and count of visible columns
+    const defaultColumnWidth = useDefaultColumnWidth(
+      virtualizeContainerWidth,
+      leadingControlColumns,
+      trailingControlColumns,
+      columns
+    );
 
-  // compute the default column width from the container's width and count of visible columns
-  const defaultColumnWidth = useDefaultColumnWidth(
-    virtualizeContainerWidth,
-    leadingControlColumns,
-    trailingControlColumns,
-    columns
-  );
+    const { columnWidths, setColumnWidth, getColumnWidth } = useColumnWidths({
+      columns,
+      leadingControlColumns,
+      trailingControlColumns,
+      defaultColumnWidth,
+      onColumnResize,
+    });
 
-  const { columnWidths, setColumnWidth, getColumnWidth } = useColumnWidths({
-    columns,
-    leadingControlColumns,
-    trailingControlColumns,
-    defaultColumnWidth,
-    onColumnResize,
-  });
+    /**
+     * Header & footer
+     */
+    const { headerRow, headerRowHeight } = useDataGridHeader({
+      headerIsInteractive,
+      handleHeaderMutation,
+      switchColumnPos,
+      setVisibleColumns,
+      leadingControlColumns,
+      trailingControlColumns,
+      columns,
+      columnWidths,
+      defaultColumnWidth,
+      setColumnWidth,
+      schema,
+      schemaDetectors,
+      lockedColumns,
+    });
 
-  /**
-   * Header & footer
-   */
-  const { headerRow, headerRowHeight } = useDataGridHeader({
-    headerIsInteractive,
-    handleHeaderMutation,
-    switchColumnPos,
-    setVisibleColumns,
-    leadingControlColumns,
-    trailingControlColumns,
-    columns,
-    columnWidths,
-    defaultColumnWidth,
-    setColumnWidth,
-    schema,
-    schemaDetectors,
-    lockedColumns,
-  });
+    const { footerRow, footerRowHeight } = useDataGridFooter({
+      renderFooterCellValue,
+      renderCellPopover,
+      rowIndex: visibleRowCount,
+      visibleRowIndex: visibleRowCount,
+      interactiveCellId,
+      leadingControlColumns,
+      trailingControlColumns,
+      columns,
+      columnWidths,
+      defaultColumnWidth,
+      schema,
+    });
 
-  const { footerRow, footerRowHeight } = useDataGridFooter({
-    renderFooterCellValue,
-    renderCellPopover,
-    rowIndex: visibleRowCount,
-    visibleRowIndex: visibleRowCount,
-    interactiveCellId,
-    leadingControlColumns,
-    trailingControlColumns,
-    columns,
-    columnWidths,
-    defaultColumnWidth,
-    schema,
-  });
-
-  /**
-   * Handle scrolling cells fully into view
-   */
-  useScroll({
-    gridRef,
-    outerGridRef,
-    hasGridScrolling: hasVerticalScroll || hasHorizontalScroll,
-    headerRowHeight,
-    footerRowHeight,
-    visibleRowCount,
-    hasStickyFooter: !!(renderFooterCellValue && gridStyles.stickyFooter),
-  });
-
-  /**
-   * Row manager
-   */
-  const rowManager = useRowManager({
-    innerGridRef,
-    rowClasses: gridStyles.rowClasses,
-  });
-
-  /**
-   * Heights
-   */
-  const rowHeightUtils = useRowHeightUtils({
-    virtualization: {
+    /**
+     * Handle scrolling cells fully into view
+     */
+    useScroll({
       gridRef,
-      outerGridElementRef: outerGridRef,
-      gridItemsRenderedRef: gridItemsRendered,
-    },
-    rowHeightsOptions,
-    gridStyles,
-    columns,
-  });
+      outerGridRef,
+      hasGridScrolling: hasVerticalScroll || hasHorizontalScroll,
+      headerRowHeight,
+      footerRowHeight,
+      visibleRowCount,
+      hasStickyFooter: !!(renderFooterCellValue && gridStyles.stickyFooter),
+    });
 
-  const { defaultRowHeight, setRowHeight, getRowHeight } = useDefaultRowHeight({
-    rowHeightsOptions,
-    rowHeightUtils,
-  });
+    /**
+     * Row manager
+     */
+    const rowManager = useRowManager({
+      innerGridRef,
+      rowClasses: gridStyles.rowClasses,
+    });
 
-  const unconstrainedHeight = useUnconstrainedHeight({
-    rowHeightUtils,
-    startRow,
-    endRow,
-    rowHeightsOptions,
-    defaultRowHeight,
-    headerRowHeight,
-    footerRowHeight,
-    scrollBarHeight,
-    innerGridRef,
-  });
+    /**
+     * Heights
+     */
+    const rowHeightUtils = useRowHeightUtils({
+      virtualization: {
+        gridRef,
+        outerGridElementRef: outerGridRef,
+        gridItemsRenderedRef: gridItemsRendered,
+      },
+      rowHeightsOptions,
+      gridStyles,
+      columns,
+    });
 
-  /**
-   * Final grid height & width
-   */
-  const { finalWidth, finalHeight } = useFinalGridDimensions({
-    unconstrainedHeight,
-    unconstrainedWidth: 0, // unable to determine this until the container's size is known
-    wrapperDimensions,
-    wrapperRef,
-    isFullScreen,
-    rowCount,
-  });
+    const { defaultRowHeight, setRowHeight, getRowHeight } = useDefaultRowHeight({
+      rowHeightsOptions,
+      rowHeightUtils,
+    });
 
-  /**
-   * Grid resets
-   */
-  useEffect(() => {
-    if (gridRef.current) {
-      gridRef.current.resetAfterColumnIndex(0);
-    }
-  }, [gridRef, columns, columnWidths, defaultColumnWidth]);
+    const unconstrainedHeight = useUnconstrainedHeight({
+      rowHeightUtils,
+      startRow,
+      endRow,
+      rowHeightsOptions,
+      defaultRowHeight,
+      headerRowHeight,
+      footerRowHeight,
+      scrollBarHeight,
+      innerGridRef,
+    });
 
-  useEffect(() => {
-    if (gridRef.current && rowHeightsOptions) {
-      gridRef.current.resetAfterRowIndex(0);
-    }
-  }, [
-    gridRef,
-    pagination?.pageIndex,
-    rowHeightsOptions,
-    gridStyles?.cellPadding,
-    gridStyles?.fontSize,
-  ]);
+    /**
+     * Final grid height & width
+     */
+    const { finalWidth, finalHeight } = useFinalGridDimensions({
+      unconstrainedHeight,
+      unconstrainedWidth: 0, // unable to determine this until the container's size is known
+      wrapperDimensions,
+      wrapperRef,
+      isFullScreen,
+      rowCount,
+    });
 
-  useEffect(() => {
-    if (gridRef.current) {
-      gridRef.current.resetAfterRowIndex(0);
-    }
-  }, [gridRef, getRowHeight]);
+    /**
+     * Grid resets
+     */
+    useEffect(() => {
+      if (gridRef.current) {
+        gridRef.current.resetAfterColumnIndex(0);
+      }
+    }, [gridRef, columns, columnWidths, defaultColumnWidth]);
 
-  return IS_JEST_ENVIRONMENT || finalWidth > 0 ? (
-    <DataGridWrapperRowsContext.Provider
-      value={{ headerRowHeight, headerRow, footerRow }}
-    >
-      <Grid
-        {...(virtualizationOptions ? virtualizationOptions : {})}
-        ref={gridRef}
-        className={classNames(
-          'euiDataGrid__virtualized',
-          virtualizationOptions?.className
-        )}
-        disableColVirtualized={!!lockedColumns?.ahead}
-        onItemsRendered={(itemsRendered) => {
-          gridItemsRendered.current = itemsRendered;
-          virtualizationOptions?.onItemsRendered?.(itemsRendered);
-        }}
-        innerElementType={InnerElement}
-        outerRef={outerGridRef}
-        innerRef={innerGridRef}
-        columnCount={visibleColCount}
-        width={finalWidth}
-        columnWidth={getColumnWidth}
-        height={finalHeight}
-        rowHeight={getRowHeight}
-        itemData={{
-          schemaDetectors,
-          setRowHeight,
-          leadingControlColumns,
-          trailingControlColumns,
-          columns,
-          visibleColCount,
-          schema,
-          columnWidths,
-          defaultColumnWidth,
-          renderCellValue,
-          renderCellPopover,
-          interactiveCellId,
-          rowHeightsOptions,
-          rowHeightUtils,
-          rowManager,
-          pagination,
-          lockedColumns,
-        }}
-        rowCount={
-          IS_JEST_ENVIRONMENT || headerRowHeight > 0 ? visibleRowCount : 0
+    useEffect(() => {
+      if (gridRef.current && rowHeightsOptions) {
+        gridRef.current.resetAfterRowIndex(0);
+      }
+    }, [
+      gridRef,
+      pagination?.pageIndex,
+      rowHeightsOptions,
+      gridStyles?.cellPadding,
+      gridStyles?.fontSize,
+    ]);
+
+    useEffect(() => {
+      if (gridRef.current) {
+        gridRef.current.resetAfterRowIndex(0);
+      }
+    }, [gridRef, getRowHeight]);
+
+    useEffect(() => {
+      const scroll = () => {
+        const scrollLeft = outerGridRef.current?.scrollLeft || 0;
+        if (scrollLeft > 0) {
+          setVirtualizedClassName('has-fix-left');
+        } else {
+          setVirtualizedClassName('');
         }
+      }
+      if (outerGridRef.current && lockedColumns?.ahead) {
+        outerGridRef.current.addEventListener('scroll', scroll)
+      }
+      return () => {
+        outerGridRef.current?.removeEventListener("scroll", scroll);
+      }
+    }, [outerGridRef, lockedColumns?.ahead, getRowHeight]);
+    
+    return IS_JEST_ENVIRONMENT || finalWidth > 0 ? (
+      <DataGridWrapperRowsContext.Provider
+        value={{ headerRowHeight, headerRow, footerRow }}
       >
-        {_Cell}
-      </Grid>
-      {scrollBorderOverlay}
-    </DataGridWrapperRowsContext.Provider>
-  ) : null;
-};
+        <Grid
+          {...(virtualizationOptions ? virtualizationOptions : {})}
+          ref={gridRef}
+          className={classNames(
+            'euiDataGrid__virtualized',
+            virtualizationOptions?.className,
+            virtualizedClassName
+          )}
+          disableColVirtualized={!!lockedColumns?.ahead}
+          onItemsRendered={(itemsRendered) => {
+            gridItemsRendered.current = itemsRendered;
+            virtualizationOptions?.onItemsRendered?.(itemsRendered);
+          }}
+          innerElementType={InnerElement}
+          outerRef={outerGridRef}
+          innerRef={innerGridRef}
+          columnCount={visibleColCount}
+          width={finalWidth}
+          columnWidth={getColumnWidth}
+          height={finalHeight}
+          rowHeight={getRowHeight}
+          itemData={{
+            schemaDetectors,
+            setRowHeight,
+            leadingControlColumns,
+            trailingControlColumns,
+            columns,
+            visibleColCount,
+            schema,
+            columnWidths,
+            defaultColumnWidth,
+            renderCellValue,
+            renderCellPopover,
+            interactiveCellId,
+            rowHeightsOptions,
+            rowHeightUtils,
+            rowManager,
+            pagination,
+            lockedColumns,
+          }}
+          rowCount={
+            IS_JEST_ENVIRONMENT || headerRowHeight > 0 ? visibleRowCount : 0
+          }
+        >
+          {_Cell}
+        </Grid>
+        {scrollBorderOverlay}
+      </DataGridWrapperRowsContext.Provider>
+    ) : null;
+  };
