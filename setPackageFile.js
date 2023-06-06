@@ -15,6 +15,7 @@ const packageConfig = require('./package.json');
 const setPackageFile = () => {
   delete packageConfig.scripts.postinstall;
   delete packageConfig.devDependencies;
+  packageConfig.dependencies['react-window'] = '1.8.6-36060940-patch';
   fs.writeFileSync(
     path.resolve('./package.json'),
     JSON.stringify(packageConfig, null, 2)
