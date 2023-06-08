@@ -1,0 +1,13 @@
+diff --git a/node_modules/@types/react-window/index.d.ts b/node_modules/@types/react-window/index.d.ts
+index a4286d9..1343a87 100644
+--- a/node_modules/@types/react-window/index.d.ts
++++ b/node_modules/@types/react-window/index.d.ts
+@@ -366,6 +366,8 @@ export interface VariableSizeGridProps<T = any> extends GridProps<T> {
+      * Returns the height of the specified row.
+      */
+     rowHeight: (index: number) => number;
++    disableColVirtualized?: boolean;
++    disableRowVirtualized?: boolean;
+ }
+ 
+ export class FixedSizeList<T = any> extends Component<FixedSizeListProps<T>> {

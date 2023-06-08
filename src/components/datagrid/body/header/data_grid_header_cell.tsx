@@ -47,14 +47,15 @@ export const EuiDataGridHeaderCell: FunctionComponent<EuiDataGridHeaderCellProps
   setVisibleColumns,
   switchColumnPos,
   headerIsInteractive,
+  style,
+  isLastSticky
 }) => {
   const { id, display, displayAsText } = column;
   const width = columnWidths[id] || defaultColumnWidth;
 
   const columnType = schema[id] ? schema[id].columnType : null;
-  const classes = classnames({
-    [`euiDataGridHeaderCell--${columnType}`]: columnType,
-  });
+  const classes = classnames({ [`euiDataGridHeaderCell--${columnType}`]: columnType }, style?.position === 'sticky' ? 'euiDataGridHeaderCellSticky' : '',
+    isLastSticky ? 'euiDataGridHeaderCellSticky_last' : '');
 
   const { setFocusedCell, focusFirstVisibleInteractiveCell } = useContext(
     DataGridFocusContext
@@ -100,6 +101,7 @@ export const EuiDataGridHeaderCell: FunctionComponent<EuiDataGridHeaderCellProps
       width={width}
       headerIsInteractive={headerIsInteractive}
       className={classes}
+      style={style}
       aria-sort={ariaSort}
     >
       {column.isResizable !== false && width != null ? (

@@ -17,7 +17,7 @@
     "sync-docs": "node ./scripts/docs-sync.js",
     "build-docs": "cross-env BABEL_MODULES=false cross-env NODE_ENV=production NODE_OPTIONS=--max-old-space-size=4096 webpack --config=src-docs/webpack.config.js",
     "build": "yarn extract-i18n-strings && node ./scripts/compile-clean.js && node ./scripts/compile-eui.js && yarn compile-scss",
-    "build-pack": "yarn build && npm pack",
+    "build-pack": "node setPackageFile.js && yarn build && npm pack",
     "compile-icons": "node ./scripts/compile-icons.js && prettier --write --loglevel=warn \"./src/components/icon/assets/**/*.tsx\"",
     "compile-scss": "node ./scripts/compile-scss.js $npm_package_name",
     "extract-i18n-strings": "node ./scripts/babel/fetch-i18n-strings",
@@ -43,7 +43,7 @@
     "yo-doc": "yo ./generator-eui/app/documentation.js",
     "yo-changelog": "yo ./generator-eui/changelog/index.js",
     "release": "node ./scripts/release.js",
-    "postinstall": "node ./scripts/postinstall.js"
+    "postinstall": "node ./scripts/postinstall.js && patch-package"
   },
   "repository": {
     "type": "git",
@@ -101,6 +101,7 @@
     "vfile": "^4.2.0"
   },
   "devDependencies": {
+    "patch-package": "^7.0.0",
     "@axe-core/puppeteer": "^4.4.2",
     "@babel/cli": "^7.10.5",
     "@babel/core": "^7.11.4",

@@ -47,12 +47,15 @@ const columns = [
   },
   {
     id: 'city',
+    initialWidth: 300
   },
   {
     id: 'country',
+    initialWidth: 300
   },
   {
     id: 'account',
+    initialWidth: 300
   },
 ];
 
@@ -356,6 +359,7 @@ export default function DataGrid() {
           leadingControlColumns={leadingControlColumns}
           trailingControlColumns={trailingControlColumns}
           columns={columns}
+          lockedColumns={{ahead:4}}
           columnVisibility={{
             visibleColumns,
             setVisibleColumns,

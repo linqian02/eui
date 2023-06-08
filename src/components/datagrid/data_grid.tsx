@@ -114,6 +114,7 @@ export const EuiDataGrid = forwardRef<EuiDataGridRefProps, EuiDataGridProps>(
       renderCellPopover,
       renderFooterCellValue,
       className,
+      lockedColumns = {},
       gridStyle,
       toolbarVisibility = true,
       pagination,
@@ -431,6 +432,7 @@ export const EuiDataGrid = forwardRef<EuiDataGridRefProps, EuiDataGridProps>(
                     visibleColCount={visibleColCount}
                     leadingControlColumns={leadingControlColumns}
                     schema={mergedSchema}
+                    lockedColumns={lockedColumns}
                     trailingControlColumns={trailingControlColumns}
                     setVisibleColumns={setVisibleColumns}
                     switchColumnPos={switchColumnPos}

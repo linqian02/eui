@@ -33,6 +33,11 @@ import { EuiTokenProps } from '../token';
 // use this to omit the react-specific class component methods
 export type ImperativeGridApi = Omit<Grid, keyof Component>;
 
+export interface EuiDataGridLockedColumns {
+  ahead?: number;
+  behind?: number;
+}
+
 export interface EuiDataGridToolbarProps {
   gridWidth: number;
   minSizeForControls?: number;
@@ -131,7 +136,10 @@ export interface EuiDataGridHeaderRowPropsSpecificProps {
 
 export type EuiDataGridHeaderRowProps = CommonProps &
   HTMLAttributes<HTMLDivElement> &
-  EuiDataGridHeaderRowPropsSpecificProps;
+  EuiDataGridHeaderRowPropsSpecificProps &
+  EuiDataGridHeaderRowPropsSpecificProps & {
+    lockedColumns?: EuiDataGridLockedColumns;
+  };;
 
 export interface EuiDataGridHeaderCellProps
   extends Omit<
@@ -140,12 +148,16 @@ export interface EuiDataGridHeaderCellProps
   > {
   column: EuiDataGridColumn;
   index: number;
+  style?: CSSProperties;
+  isLastSticky?: boolean;
 }
 
 export interface EuiDataGridControlHeaderCellProps {
   index: number;
   controlColumn: EuiDataGridControlColumn;
   headerIsInteractive: boolean;
+  style?: CSSProperties;
+  isLastSticky?: boolean;
 }
 
 export interface EuiDataGridHeaderCellWrapperProps {
@@ -154,6 +166,7 @@ export interface EuiDataGridHeaderCellWrapperProps {
   headerIsInteractive: boolean;
   width?: number | null;
   className?: string;
+  style?: CSSProperties;
 }
 
 export type EuiDataGridFooterRowProps = CommonProps &
@@ -334,6 +347,11 @@ export type CommonGridProps = CommonProps &
      * Settings provided may be overwritten or merged with user defined preferences if `toolbarVisibility.showDisplaySelector.allowRowHeight = true` (which is the default).
      */
     rowHeightsOptions?: EuiDataGridRowHeightsOptions;
+    /**
+    * A #EuiDataGridLockedColumns object.
+    * 锁定列，目前仅支持锁定前几列
+    */
+    lockedColumns?: EuiDataGridLockedColumns;
   };
 
 // Force either aria-label or aria-labelledby to be defined
@@ -400,6 +418,7 @@ export interface EuiDataGridColumnSortingDraggableProps {
 export interface EuiDataGridBodyProps {
   leadingControlColumns: EuiDataGridControlColumn[];
   trailingControlColumns: EuiDataGridControlColumn[];
+  lockedColumns?: EuiDataGridLockedColumns;
   columns: EuiDataGridColumn[];
   visibleColCount: number;
   schema: EuiDataGridSchema;
@@ -515,14 +534,14 @@ export interface EuiDataGridCellProps {
   className?: string;
   popoverContext: DataGridCellPopoverContextShape;
   renderCellValue:
-    | JSXElementConstructor<EuiDataGridCellValueElementProps>
-    | ((props: EuiDataGridCellValueElementProps) => ReactNode);
+  | JSXElementConstructor<EuiDataGridCellValueElementProps>
+  | ((props: EuiDataGridCellValueElementProps) => ReactNode);
   renderCellPopover?:
-    | JSXElementConstructor<EuiDataGridCellPopoverElementProps>
-    | ((props: EuiDataGridCellPopoverElementProps) => ReactNode);
+  | JSXElementConstructor<EuiDataGridCellPopoverElementProps>
+  | ((props: EuiDataGridCellPopoverElementProps) => ReactNode);
   setRowHeight?: (height: number) => void;
   getRowHeight?: (rowIndex: number) => number;
-  style?: React.CSSProperties;
+  style?: CSSProperties;
   rowHeightsOptions?: EuiDataGridRowHeightsOptions;
   rowHeightUtils?: RowHeightUtils;
   rowManager?: EuiDataGridRowManager;
@@ -766,15 +785,15 @@ export interface EuiDataGridToolBarVisibilityOptions {
    * Allows the ability for the user to hide fields and sort columns, boolean or a #EuiDataGridToolBarVisibilityColumnSelectorOptions
    */
   showColumnSelector?:
-    | boolean
-    | EuiDataGridToolBarVisibilityColumnSelectorOptions;
+  | boolean
+  | EuiDataGridToolBarVisibilityColumnSelectorOptions;
   /**
    * Allows the ability for the user to customize display settings such as grid density and row heights.
    * User changes will override what is provided in #EuiDataGridStyle and #EuiDataGridRowHeightsOptions
    */
   showDisplaySelector?:
-    | boolean
-    | EuiDataGridToolBarVisibilityDisplaySelectorOptions;
+  | boolean
+  | EuiDataGridToolBarVisibilityDisplaySelectorOptions;
   /**
    * Allows the ability for the user to sort rows based upon column values
    */

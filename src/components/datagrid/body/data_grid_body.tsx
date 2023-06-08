@@ -16,6 +16,7 @@ import React, {
   useMemo,
   useRef,
   useState,
+  CSSProperties,
 } from 'react';
 import {
   GridChildComponentProps,
@@ -59,6 +60,7 @@ export const Cell: FunctionComponent<GridChildComponentProps> = ({
     visibleColCount,
     schema,
     columnWidths,
+    lockedColumns,
     defaultColumnWidth,
     renderCellValue,
     renderCellPopover,
@@ -73,7 +75,6 @@ export const Cell: FunctionComponent<GridChildComponentProps> = ({
   const popoverContext = useContext(DataGridCellPopoverContext);
   const { headerRowHeight } = useContext(DataGridWrapperRowsContext);
   const { getCorrectRowIndex } = useContext(DataGridSortingContext);
-
   let cellContent;
 
   const isFirstColumn = columnIndex === 0;
@@ -95,15 +96,17 @@ export const Cell: FunctionComponent<GridChildComponentProps> = ({
     }
   )[0];
   const textTransform = transformClass?.textTransform;
-
+  const lockedColHeadCount = lockedColumns?.ahead || 0;
   const classes = classNames({
     'euiDataGridRowCell--firstColumn': isFirstColumn,
     'euiDataGridRowCell--lastColumn': isLastColumn,
     'euiDataGridRowCell--controlColumn':
       isLeadingControlColumn || isTrailingControlColumn,
     [`euiDataGridRowCell--${textTransform}`]: textTransform,
-  });
-
+  }, columnIndex < lockedColHeadCount ? 'euiDataGridCellSticky' : ' ',
+    columnIndex === lockedColHeadCount - 1
+      ? 'euiDataGridCellSticky_last'
+      : ' ');
   const sharedCellProps = {
     rowIndex: getCorrectRowIndex(visibleRowIndex),
     visibleRowIndex,
@@ -113,7 +116,10 @@ export const Cell: FunctionComponent<GridChildComponentProps> = ({
     style: {
       ...style,
       top: `${parseFloat(style.top as string) + headerRowHeight}px`,
-    },
+      display: 'inline-block',
+      position: columnIndex < lockedColHeadCount ? 'sticky' : 'absolute',
+      zIndex: columnIndex < lockedColHeadCount ? 1 : 0,
+    } as CSSProperties,
     rowHeightsOptions,
     rowHeightUtils,
     setRowHeight: isFirstColumn ? setRowHeight : undefined,
@@ -217,6 +223,7 @@ export const EuiDataGridBody: FunctionComponent<EuiDataGridBodyProps> = (
     trailingControlColumns,
     columns,
     visibleColCount,
+    lockedColumns,
     schema,
     schemaDetectors,
     rowCount,
@@ -247,6 +254,7 @@ export const EuiDataGridBody: FunctionComponent<EuiDataGridBodyProps> = (
   const wrapperDimensions = useResizeObserver(wrapperRef.current);
   const outerGridRef = useRef<HTMLDivElement | null>(null); // container that becomes scrollable
   const innerGridRef = useRef<HTMLDivElement | null>(null); // container sized to fit all content
+  const [virtualizedClassName, setVirtualizedClassName] = useState('');
 
   /**
    * Scroll bars
@@ -301,6 +309,7 @@ export const EuiDataGridBody: FunctionComponent<EuiDataGridBodyProps> = (
         setVisibleColumns={setVisibleColumns}
         leadingControlColumns={leadingControlColumns}
         trailingControlColumns={trailingControlColumns}
+        lockedColumns={lockedColumns}
         columns={columns}
         columnWidths={columnWidths}
         defaultColumnWidth={defaultColumnWidth}
@@ -322,6 +331,7 @@ export const EuiDataGridBody: FunctionComponent<EuiDataGridBodyProps> = (
     schema,
     schemaDetectors,
     headerIsInteractive,
+    lockedColumns
   ]);
 
   useHeaderFocusWorkaround(headerIsInteractive);
@@ -452,6 +462,23 @@ export const EuiDataGridBody: FunctionComponent<EuiDataGridBodyProps> = (
     }
   }, [gridRef, getRowHeight]);
 
+  useEffect(() => {
+    const scroll = () => {
+      const scrollLeft = outerGridRef.current?.scrollLeft || 0;
+      if (scrollLeft > 0) {
+        setVirtualizedClassName('has-fix-left');
+      } else {
+        setVirtualizedClassName('');
+      }
+    }
+    if (outerGridRef.current && lockedColumns?.ahead) {
+      outerGridRef.current.addEventListener('scroll', scroll)
+    }
+    return () => {
+      outerGridRef.current?.removeEventListener("scroll", scroll);
+    }
+  }, [outerGridRef, lockedColumns?.ahead, getRowHeight]);
+
   return IS_JEST_ENVIRONMENT || finalWidth > 0 ? (
     <DataGridWrapperRowsContext.Provider
       value={{ headerRowHeight, headerRow, footerRow }}
@@ -461,8 +488,10 @@ export const EuiDataGridBody: FunctionComponent<EuiDataGridBodyProps> = (
         ref={gridRef}
         className={classNames(
           'euiDataGrid__virtualized',
-          virtualizationOptions?.className
+          virtualizationOptions?.className,
+          virtualizedClassName
         )}
+        disableColVirtualized={!!lockedColumns?.ahead}
         onItemsRendered={(itemsRendered) => {
           gridItemsRendered.current = itemsRendered;
           virtualizationOptions?.onItemsRendered?.(itemsRendered);
@@ -489,6 +518,7 @@ export const EuiDataGridBody: FunctionComponent<EuiDataGridBodyProps> = (
           renderCellPopover,
           interactiveCellId,
           rowHeightsOptions,
+          lockedColumns,
           rowHeightUtils,
           rowManager,
           pagination,
