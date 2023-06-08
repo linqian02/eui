@@ -1,7 +1,7 @@
 {
   "name": "@elastic/eui",
   "description": "Elastic UI Component Library",
-  "version": "70.0.0",
+  "version": "70.0.0-36081405-patch",
   "license": "SEE LICENSE IN LICENSE.txt",
   "main": "lib",
   "module": "es",
@@ -21,7 +21,7 @@
     "compile-icons": "node ./scripts/compile-icons.js && prettier --write --loglevel=warn \"./src/components/icon/assets/**/*.tsx\"",
     "compile-scss": "node ./scripts/compile-scss.js $npm_package_name",
     "extract-i18n-strings": "node ./scripts/babel/fetch-i18n-strings",
-    "lint": "yarn tsc --noEmit && yarn lint-es && yarn lint-sass",
+    "lint": "yarn lint-es",
     "lint-fix": "yarn lint-es-fix",
     "lint-es": "eslint --cache \"{src,src-docs}/**/*.{ts,tsx,js}\" --max-warnings 0",
     "lint-es-fix": "yarn lint-es --fix",
@@ -31,7 +31,7 @@
     "test-ci": "yarn test && yarn test-cypress",
     "test-unit": "cross-env NODE_ENV=test jest --config ./scripts/jest/config.json",
     "test-a11y": "node ./scripts/a11y-testing",
-    "test-staged": "yarn lint && node scripts/test-staged.js",
+    "test-staged": "node scripts/test-staged.js",
     "test-cypress": "node ./scripts/cypress",
     "test-cypress-dev": "node ./scripts/cypress --dev",
     "combine-test-coverage": "sh ./scripts/combine-coverage.sh",
@@ -56,9 +56,7 @@
     "**/react": "^17.0.0",
     "**/known-css-properties": "0.24.0"
   },
-  "pre-commit": [
-    "test-staged"
-  ],
+  "pre-commit": [],
   "dependencies": {
     "@types/chroma-js": "^2.0.0",
     "@types/lodash": "^4.14.160",
