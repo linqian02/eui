@@ -189,18 +189,15 @@ export const EuiDataGrid = forwardRef<EuiDataGridRefProps, EuiDataGridProps>(
       );
     }, [columns]);
 
-    const [
-      displaySelector,
-      gridStyles,
-      rowHeightsOptions,
-    ] = useDataGridDisplaySelector(
-      checkOrDefaultToolBarDisplayOptions(
-        toolbarVisibility,
-        'showDisplaySelector'
-      ),
-      gridStyleWithDefaults,
-      _rowHeightsOptions
-    );
+    const [displaySelector, gridStyles, rowHeightsOptions] =
+      useDataGridDisplaySelector(
+        checkOrDefaultToolBarDisplayOptions(
+          toolbarVisibility,
+          'showDisplaySelector'
+        ),
+        gridStyleWithDefaults,
+        _rowHeightsOptions
+      );
 
     /**
      * Column order & visibility
@@ -257,10 +254,8 @@ export const EuiDataGrid = forwardRef<EuiDataGridRefProps, EuiDataGridProps>(
     /**
      * Focus
      */
-    const {
-      headerIsInteractive,
-      handleHeaderMutation,
-    } = useHeaderIsInteractive(contentRef.current);
+    const { headerIsInteractive, handleHeaderMutation } =
+      useHeaderIsInteractive(contentRef.current);
     const { focusProps: wrappingDivFocusProps, ...focusContext } = useFocus({
       headerIsInteractive,
       gridItemsRendered,
@@ -367,118 +362,113 @@ export const EuiDataGrid = forwardRef<EuiDataGridRefProps, EuiDataGridProps>(
       <DataGridFocusContext.Provider value={focusContext}>
         <DataGridCellPopoverContext.Provider value={cellPopoverContext}>
           <DataGridSortingContext.Provider value={sortingContext}>
-            <EuiFocusTrap
-              disabled={!isFullScreen}
-              className="euiDataGrid__focusWrap"
+            <div
+              className={classes}
+              onKeyDown={handleGridKeyDown}
+              style={isFullScreen ? undefined : { width, height }}
+              ref={setResizeRef}
+              {...rest}
             >
-              <div
-                className={classes}
-                onKeyDown={handleGridKeyDown}
-                style={isFullScreen ? undefined : { width, height }}
-                ref={setResizeRef}
-                {...rest}
+              {showToolbar && (
+                <EuiDataGridToolbar
+                  gridWidth={gridWidth}
+                  minSizeForControls={minSizeForControls}
+                  toolbarVisibility={toolbarVisibility}
+                  isFullScreen={isFullScreen}
+                  fullScreenSelector={fullScreenSelector}
+                  displaySelector={displaySelector}
+                  columnSelector={columnSelector}
+                  columnSorting={columnSorting}
+                />
+              )}
+              {inMemory ? (
+                <EuiDataGridInMemoryRenderer
+                  inMemory={inMemory}
+                  renderCellValue={renderCellValue}
+                  columns={columns}
+                  rowCount={
+                    inMemory.level === 'enhancements'
+                      ? // if `inMemory.level === enhancements` then we can only be sure the pagination's pageSize is available in memory
+                        pagination?.pageSize || rowCount
+                      : // otherwise, all of the data is present and usable
+                        rowCount
+                  }
+                  onCellRender={onCellRender}
+                />
+              ) : null}
+              <div // eslint-disable-line jsx-a11y/interactive-supports-focus
+                ref={contentRef}
+                onKeyDown={createKeyDownHandler({
+                  gridElement: contentRef.current,
+                  visibleColCount,
+                  visibleRowCount,
+                  visibleRowStartIndex:
+                    gridItemsRendered.current?.visibleRowStartIndex || 0,
+                  rowCount,
+                  pagination,
+                  hasFooter: !!renderFooterCellValue,
+                  headerIsInteractive,
+                  focusContext,
+                })}
+                data-test-subj="euiDataGridBody"
+                className="euiDataGrid__content"
+                role="grid"
+                aria-rowcount={rowCount}
+                id={gridId}
+                {...wrappingDivFocusProps} // re: above jsx-a11y - tabIndex is handled by these props, but the linter isn't smart enough to know that
+                {...gridAriaProps}
               >
-                {showToolbar && (
-                  <EuiDataGridToolbar
-                    gridWidth={gridWidth}
-                    minSizeForControls={minSizeForControls}
-                    toolbarVisibility={toolbarVisibility}
-                    isFullScreen={isFullScreen}
-                    fullScreenSelector={fullScreenSelector}
-                    displaySelector={displaySelector}
-                    columnSelector={columnSelector}
-                    columnSorting={columnSorting}
-                  />
-                )}
-                {inMemory ? (
-                  <EuiDataGridInMemoryRenderer
-                    inMemory={inMemory}
-                    renderCellValue={renderCellValue}
-                    columns={columns}
-                    rowCount={
-                      inMemory.level === 'enhancements'
-                        ? // if `inMemory.level === enhancements` then we can only be sure the pagination's pageSize is available in memory
-                          pagination?.pageSize || rowCount
-                        : // otherwise, all of the data is present and usable
-                          rowCount
-                    }
-                    onCellRender={onCellRender}
-                  />
-                ) : null}
-                <div // eslint-disable-line jsx-a11y/interactive-supports-focus
-                  ref={contentRef}
-                  onKeyDown={createKeyDownHandler({
-                    gridElement: contentRef.current,
-                    visibleColCount,
-                    visibleRowCount,
-                    visibleRowStartIndex:
-                      gridItemsRendered.current?.visibleRowStartIndex || 0,
-                    rowCount,
-                    pagination,
-                    hasFooter: !!renderFooterCellValue,
-                    headerIsInteractive,
-                    focusContext,
-                  })}
-                  data-test-subj="euiDataGridBody"
-                  className="euiDataGrid__content"
-                  role="grid"
-                  aria-rowcount={rowCount}
-                  id={gridId}
-                  {...wrappingDivFocusProps} // re: above jsx-a11y - tabIndex is handled by these props, but the linter isn't smart enough to know that
-                  {...gridAriaProps}
-                >
-                  <EuiDataGridBody
-                    columns={orderedVisibleColumns}
-                    visibleColCount={visibleColCount}
-                    leadingControlColumns={leadingControlColumns}
-                    schema={mergedSchema}
-                    lockedColumns={lockedColumns}
-                    trailingControlColumns={trailingControlColumns}
-                    setVisibleColumns={setVisibleColumns}
-                    switchColumnPos={switchColumnPos}
-                    onColumnResize={onColumnResize}
-                    headerIsInteractive={headerIsInteractive}
-                    handleHeaderMutation={handleHeaderMutation}
-                    schemaDetectors={allSchemaDetectors}
-                    pagination={pagination}
-                    renderCellValue={renderCellValue}
-                    renderCellPopover={renderCellPopover}
-                    renderFooterCellValue={renderFooterCellValue}
-                    rowCount={rowCount}
-                    visibleRows={visibleRows}
-                    interactiveCellId={interactiveCellId}
-                    rowHeightsOptions={rowHeightsOptions}
-                    virtualizationOptions={virtualizationOptions || {}}
-                    isFullScreen={isFullScreen}
-                    gridStyles={gridStyles}
-                    gridWidth={gridWidth}
-                    gridRef={gridRef}
-                    gridItemsRendered={gridItemsRendered}
-                    wrapperRef={contentRef}
-                  />
-                </div>
-                {pagination && props['aria-labelledby'] && (
-                  <p id={ariaLabelledById} hidden>
-                    {ariaLabelledBy}
-                  </p>
-                )}
-                {pagination && (
-                  <EuiDataGridPaginationRenderer
-                    {...pagination}
-                    rowCount={rowCount}
-                    controls={gridId}
-                    aria-label={props['aria-label']}
-                  />
-                )}
-                <p id={interactiveCellId} hidden>
-                  <EuiI18n
-                    token="euiDataGrid.screenReaderNotice"
-                    default="Cell contains interactive content."
-                  />
-                  {/* TODO: if no keyboard shortcuts panel gets built, add keyboard shortcut info here */}
-                </p>
+                <EuiDataGridBody
+                  columns={orderedVisibleColumns}
+                  visibleColCount={visibleColCount}
+                  leadingControlColumns={leadingControlColumns}
+                  schema={mergedSchema}
+                  lockedColumns={lockedColumns}
+                  trailingControlColumns={trailingControlColumns}
+                  setVisibleColumns={setVisibleColumns}
+                  switchColumnPos={switchColumnPos}
+                  onColumnResize={onColumnResize}
+                  headerIsInteractive={headerIsInteractive}
+                  handleHeaderMutation={handleHeaderMutation}
+                  schemaDetectors={allSchemaDetectors}
+                  pagination={pagination}
+                  renderCellValue={renderCellValue}
+                  renderCellPopover={renderCellPopover}
+                  renderFooterCellValue={renderFooterCellValue}
+                  rowCount={rowCount}
+                  visibleRows={visibleRows}
+                  interactiveCellId={interactiveCellId}
+                  rowHeightsOptions={rowHeightsOptions}
+                  virtualizationOptions={virtualizationOptions || {}}
+                  isFullScreen={isFullScreen}
+                  gridStyles={gridStyles}
+                  gridWidth={gridWidth}
+                  gridRef={gridRef}
+                  gridItemsRendered={gridItemsRendered}
+                  wrapperRef={contentRef}
+                />
               </div>
-            </EuiFocusTrap>
+              {pagination && props['aria-labelledby'] && (
+                <p id={ariaLabelledById} hidden>
+                  {ariaLabelledBy}
+                </p>
+              )}
+              {pagination && (
+                <EuiDataGridPaginationRenderer
+                  {...pagination}
+                  rowCount={rowCount}
+                  controls={gridId}
+                  aria-label={props['aria-label']}
+                />
+              )}
+              <p id={interactiveCellId} hidden>
+                <EuiI18n
+                  token="euiDataGrid.screenReaderNotice"
+                  default="Cell contains interactive content."
+                />
+                {/* TODO: if no keyboard shortcuts panel gets built, add keyboard shortcut info here */}
+              </p>
+            </div>
           </DataGridSortingContext.Provider>
           {cellPopover}
         </DataGridCellPopoverContext.Provider>
